@@ -7,9 +7,6 @@
                 <div class="col-md-6">
                     <p class="mb-0">&copy; <?php echo date('Y'); ?> Klinik Management System. All rights reserved.</p>
                 </div>
-                <div class="col-md-6 text-end">
-                    <p class="mb-0">Version 1.0.0</p>
-                </div>
             </div>
         </div>
     </footer>

@@ -17,7 +17,7 @@ $allowed_pages = [
     'dashboard',
     'pasien',
     'tindakan',
-    'diagnosis',
+    'rekam_medis',
     'dokter',
     'ruang',
     'logout'

@@ -255,20 +255,9 @@ body {
     font-size: 2rem !important;
 }
 
-/* --- Header Customization --- */
-header.bg-white {
-    border-bottom: 1px solid #e5e7eb;
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-    margin-bottom: 0;
-}
-
 /* --- Navbar Customization --- */
 .navbar {
-    border-top: 1px solid #e5e7eb;
-    border-bottom: none;
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e5e7eb;
 }
 .navbar .navbar-brand img {
     border-radius: 8px;

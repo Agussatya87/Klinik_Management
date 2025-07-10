@@ -13,22 +13,13 @@
     <link href="assets/css/style.css" rel="stylesheet">
 </head>
 <body>
-    <!-- Header Section -->
-    <header class="bg-white shadow-sm py-3 mb-0">
-        <div class="container-fluid d-flex flex-column flex-md-row align-items-center justify-content-between gap-2 text-center text-md-start">
-            <a class="navbar-brand d-flex align-items-center gap-2 mb-2 mb-md-0 mx-auto mx-md-0" href="index.php">
-                <img src="assets/logo.jpg" alt="Logo" width="48" height="48" class="me-2" style="object-fit:contain;">
-                <span class="fw-bold fs-4 text-dark">Klinik Pratama Management System</span>
-            </a>
-            <a href="index.php?page=logout" class="btn btn-outline-secondary rounded-3 px-4 fw-semibold mx-auto mx-md-0">
-                <i class="bi bi-box-arrow-right"></i> Logout
-            </a>
-        </div>
-    </header>
-
-    <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white border-top shadow-sm py-2">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-3">
         <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="index.php">
+                <img src="assets/logo.jpg" alt="Logo" width="48" height="48" class="me-2" style="object-fit:contain;">
+                <span class="fw-bold fs-4 text-dark">Klinik Management System</span>
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -36,7 +27,7 @@
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item">
                         <a class="nav-link px-3 fw-semibold d-flex align-items-center gap-1 <?php echo ($page == 'dashboard') ? 'active' : ''; ?>" href="index.php">
-                            <i class="bi bi-activity"></i> Dashboard Overview
+                            <i class="bi bi-activity"></i> Dashboard
                         </a>
                     </li>
                     <li class="nav-item">
@@ -56,15 +47,20 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link px-3 fw-semibold d-flex align-items-center gap-1 <?php echo ($page == 'dokter') ? 'active' : ''; ?>" href="index.php?page=dokter">
-                            <i class="bi bi-person-badge"></i> Manajemen Dokter
+                            <i class="bi bi-person-badge"></i> Data Dokter
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link px-3 fw-semibold d-flex align-items-center gap-1 <?php echo ($page == 'ruang') ? 'active' : ''; ?>" href="index.php?page=ruang">
-                            <i class="bi bi-building"></i> Manajemen Ruang
+                            <i class="bi bi-buildings"></i> Ruangan
                         </a>
                     </li>
                 </ul>
+                <div class="d-flex align-items-center gap-2">
+                    <a href="index.php?page=logout" class="btn btn-outline-secondary rounded-3 px-4 fw-semibold">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </a>
+                </div>
             </div>
         </div>
     </nav>

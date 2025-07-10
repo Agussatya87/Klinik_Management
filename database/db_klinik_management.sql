@@ -1,0 +1,233 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1
+-- Generation Time: Jul 08, 2025 at 09:43 AM
+-- Server version: 10.4.28-MariaDB
+-- PHP Version: 8.2.4
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `db_klinik_management`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `dokter`
+--
+
+CREATE TABLE `dokter` (
+  `iddokter` int(11) NOT NULL,
+  `nama` varchar(100) NOT NULL,
+  `jenis_kelamin` enum('L','P') NOT NULL,
+  `telpon` varchar(20) DEFAULT NULL,
+  `alamat` text DEFAULT NULL,
+  `spesialisasi` varchar(100) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `pasien`
+--
+
+CREATE TABLE `pasien` (
+  `idpasien` int(11) NOT NULL,
+  `nama` varchar(100) NOT NULL,
+  `jenis_kelamin` enum('L','P') NOT NULL,
+  `pekerjaan` varchar(100) DEFAULT NULL,
+  `tmp_lahir` varchar(100) DEFAULT NULL,
+  `tgl_lahir` date DEFAULT NULL,
+  `telpon` varchar(20) DEFAULT NULL,
+  `alamat` text DEFAULT NULL,
+  `tgl_daftar` date DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `pasien`
+--
+
+INSERT INTO `pasien` (`idpasien`, `nama`, `jenis_kelamin`, `pekerjaan`, `tmp_lahir`, `tgl_lahir`, `telpon`, `alamat`, `tgl_daftar`) VALUES
+(1, 'Tono', 'L', 'Chef', 'Mataram', '2000-01-18', '087123456789', 'Jl. Merdeka no 11', '2025-07-06');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `rekam_medis`
+--
+
+CREATE TABLE `rekam_medis` (
+  `idrm` int(11) NOT NULL,
+  `idpasien` int(11) NOT NULL,
+  `iddokter` int(11) NOT NULL,
+  `idruang` int(11) DEFAULT NULL,
+  `diagnosis` text DEFAULT NULL,
+  `idtindakan` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `ruang`
+--
+
+CREATE TABLE `ruang` (
+  `idruang` int(11) NOT NULL,
+  `nama_ruang` varchar(100) DEFAULT NULL,
+  `status` enum('Kosong','Terisi') DEFAULT 'Kosong'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tindakan`
+--
+
+CREATE TABLE `tindakan` (
+  `idtindakan` int(11) NOT NULL,
+  `idpasien` int(11) NOT NULL,
+  `kriteria` text DEFAULT NULL,
+  `tindakan` text DEFAULT NULL,
+  `dokter` varchar(100) DEFAULT NULL,
+  `fasilitas` text DEFAULT NULL,
+  `keputusan_keluarga` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users`
+--
+
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL,
+  `username` varchar(25) NOT NULL,
+  `password` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `username`, `password`) VALUES
+(8, 'admin', '0192023a7bbd73250516f069df18b500');
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `dokter`
+--
+ALTER TABLE `dokter`
+  ADD PRIMARY KEY (`iddokter`);
+
+--
+-- Indexes for table `pasien`
+--
+ALTER TABLE `pasien`
+  ADD PRIMARY KEY (`idpasien`);
+
+--
+-- Indexes for table `rekam_medis`
+--
+ALTER TABLE `rekam_medis`
+  ADD PRIMARY KEY (`idrm`),
+  ADD KEY `idpasien` (`idpasien`),
+  ADD KEY `iddokter` (`iddokter`),
+  ADD KEY `idruang` (`idruang`),
+  ADD KEY `idtindakan` (`idtindakan`);
+
+--
+-- Indexes for table `ruang`
+--
+ALTER TABLE `ruang`
+  ADD PRIMARY KEY (`idruang`);
+
+--
+-- Indexes for table `tindakan`
+--
+ALTER TABLE `tindakan`
+  ADD PRIMARY KEY (`idtindakan`),
+  ADD KEY `idpasien` (`idpasien`);
+
+--
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `dokter`
+--
+ALTER TABLE `dokter`
+  MODIFY `iddokter` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `pasien`
+--
+ALTER TABLE `pasien`
+  MODIFY `idpasien` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `rekam_medis`
+--
+ALTER TABLE `rekam_medis`
+  MODIFY `idrm` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `ruang`
+--
+ALTER TABLE `ruang`
+  MODIFY `idruang` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tindakan`
+--
+ALTER TABLE `tindakan`
+  MODIFY `idtindakan` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `rekam_medis`
+--
+ALTER TABLE `rekam_medis`
+  ADD CONSTRAINT `rekam_medis_ibfk_1` FOREIGN KEY (`idpasien`) REFERENCES `pasien` (`idpasien`),
+  ADD CONSTRAINT `rekam_medis_ibfk_2` FOREIGN KEY (`iddokter`) REFERENCES `dokter` (`iddokter`),
+  ADD CONSTRAINT `rekam_medis_ibfk_3` FOREIGN KEY (`idruang`) REFERENCES `ruang` (`idruang`),
+  ADD CONSTRAINT `rekam_medis_ibfk_4` FOREIGN KEY (`idtindakan`) REFERENCES `tindakan` (`idtindakan`);
+
+--
+-- Constraints for table `tindakan`
+--
+ALTER TABLE `tindakan`
+  ADD CONSTRAINT `tindakan_ibfk_1` FOREIGN KEY (`idpasien`) REFERENCES `pasien` (`idpasien`);
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

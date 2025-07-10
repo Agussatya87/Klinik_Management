@@ -1,5 +1,5 @@
 <?php
-$action = isset($_GET['action']) ? $_GET['action'] : 'list';
+$action = isset($_POST['action']) ? $_POST['action'] : (isset($_GET['action']) ? $_GET['action'] : 'list');
 $search = isset($_GET['search']) ? sanitizeInput($_GET['search']) : '';
 $page_num = isset($_GET['page_num']) ? (int)$_GET['page_num'] : 1;
 
@@ -7,34 +7,34 @@ $page_num = isset($_GET['page_num']) ? (int)$_GET['page_num'] : 1;
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($action == 'add' || $action == 'edit') {
         $nama = sanitizeInput($_POST['nama']);
-        $no_rm = sanitizeInput($_POST['no_rm']);
-        $alamat = sanitizeInput($_POST['alamat']);
-        $telepon = sanitizeInput($_POST['telepon']);
-        $tanggal_lahir = $_POST['tanggal_lahir'];
         $jenis_kelamin = $_POST['jenis_kelamin'];
-        
-        $errors = validateRequired($_POST, ['nama', 'no_rm', 'alamat', 'telepon', 'tanggal_lahir', 'jenis_kelamin']);
-        
+        $pekerjaan = sanitizeInput($_POST['pekerjaan']);
+        $tmp_lahir = sanitizeInput($_POST['tmp_lahir']);
+        $tgl_lahir = $_POST['tgl_lahir'];
+        $telpon = sanitizeInput($_POST['telpon']);
+        $alamat = sanitizeInput($_POST['alamat']);
+        $tgl_daftar = $_POST['tgl_daftar'] ?? date('Y-m-d');
+
+        $errors = validateRequired($_POST, ['nama', 'jenis_kelamin', 'telpon']);
+
         if (empty($errors)) {
             if ($action == 'add') {
-                $sql = "INSERT INTO pasien (nama, no_rm, alamat, telepon, tanggal_lahir, jenis_kelamin, created_at) 
-                        VALUES (?, ?, ?, ?, ?, ?, NOW())";
-                executeQuery($sql, [$nama, $no_rm, $alamat, $telepon, $tanggal_lahir, $jenis_kelamin]);
+                $sql = "INSERT INTO pasien (nama, jenis_kelamin, pekerjaan, tmp_lahir, tgl_lahir, telpon, alamat, tgl_daftar) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                executeQuery($sql, [$nama, $jenis_kelamin, $pekerjaan, $tmp_lahir, $tgl_lahir, $telpon, $alamat, $tgl_daftar]);
                 setFlashMessage('success', 'Data pasien berhasil ditambahkan');
             } else {
-                $id = (int)$_POST['id'];
-                $sql = "UPDATE pasien SET nama = ?, no_rm = ?, alamat = ?, telepon = ?, 
-                        tanggal_lahir = ?, jenis_kelamin = ? WHERE id = ?";
-                executeQuery($sql, [$nama, $no_rm, $alamat, $telepon, $tanggal_lahir, $jenis_kelamin, $id]);
+                $idpasien = (int)$_POST['idpasien'];
+                $sql = "UPDATE pasien SET nama = ?, jenis_kelamin = ?, pekerjaan = ?, tmp_lahir = ?, tgl_lahir = ?, telpon = ?, alamat = ?, tgl_daftar = ? WHERE idpasien = ?";
+                executeQuery($sql, [$nama, $jenis_kelamin, $pekerjaan, $tmp_lahir, $tgl_lahir, $telpon, $alamat, $tgl_daftar, $idpasien]);
                 setFlashMessage('success', 'Data pasien berhasil diperbarui');
             }
             header('Location: index.php?page=pasien');
             exit();
         }
     } elseif ($action == 'delete') {
-        $id = (int)$_POST['id'];
-        $sql = "DELETE FROM pasien WHERE id = ?";
-        executeQuery($sql, [$id]);
+        $idpasien = (int)$_POST['idpasien'];
+        $sql = "DELETE FROM pasien WHERE idpasien = ?";
+        executeQuery($sql, [$idpasien]);
         setFlashMessage('success', 'Data pasien berhasil dihapus');
         header('Location: index.php?page=pasien');
         exit();
@@ -43,10 +43,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 // Get patient data for edit
 $patient = null;
-if ($action == 'edit' && isset($_GET['id'])) {
-    $id = (int)$_GET['id'];
-    $sql = "SELECT * FROM pasien WHERE id = ?";
-    $patient = fetchOne($sql, [$id]);
+if ($action == 'edit' && isset($_GET['idpasien'])) {
+    $idpasien = (int)$_GET['idpasien'];
+    $sql = "SELECT * FROM pasien WHERE idpasien = ?";
+    $patient = fetchOne($sql, [$idpasien]);
     if (!$patient) {
         setFlashMessage('danger', 'Data pasien tidak ditemukan');
         header('Location: index.php?page=pasien');
@@ -58,24 +58,24 @@ if ($action == 'edit' && isset($_GET['id'])) {
 if ($action == 'list') {
     $where_clause = "";
     $params = [];
-    
+
     if (!empty($search)) {
-        $where_clause = "WHERE nama LIKE ? OR no_rm LIKE ? OR alamat LIKE ?";
+        $where_clause = "WHERE nama LIKE ? OR pekerjaan LIKE ? OR alamat LIKE ?";
         $search_param = "%{$search}%";
         $params = [$search_param, $search_param, $search_param];
     }
-    
+
     // Get total records for pagination
     $count_sql = "SELECT COUNT(*) as total FROM pasien " . $where_clause;
     $total_result = fetchOne($count_sql, $params);
     $total_records = $total_result['total'];
-    
+
     // Pagination
     $records_per_page = 10;
     $pagination = getPagination($total_records, $records_per_page, $page_num);
-    
+
     // Get patients
-    $sql = "SELECT * FROM pasien {$where_clause} ORDER BY created_at DESC LIMIT {$pagination['offset']}, {$pagination['records_per_page']}";
+    $sql = "SELECT * FROM pasien {$where_clause} ORDER BY tgl_daftar DESC LIMIT {$pagination['offset']}, {$pagination['records_per_page']}";
     $patients = fetchAll($sql, $params);
 }
 ?>
@@ -86,9 +86,9 @@ if ($action == 'list') {
         <h1 class="h3 mb-0">
             <i class="bi bi-people text-primary"></i> Data Pasien
         </h1>
-        <a href="index.php?page=pasien&action=add" class="btn btn-primary">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#pasienModal" onclick="openAddPatientModal()">
             <i class="bi bi-person-plus"></i> Tambah Pasien
-        </a>
+        </button>
     </div>
 
     <?php if ($action == 'list'): ?>
@@ -101,7 +101,7 @@ if ($action == 'list') {
                         <div class="col-md-8">
                             <div class="input-group">
                                 <input type="text" class="form-control" name="search" 
-                                       placeholder="Cari nama, no RM, atau alamat..." 
+                                       placeholder="Cari nama, pekerjaan, atau alamat..." 
                                        value="<?php echo htmlspecialchars($search); ?>">
                                 <button class="btn btn-outline-secondary" type="submit">
                                     <i class="bi bi-search"></i>
@@ -136,9 +136,10 @@ if ($action == 'list') {
                         <table class="table table-hover">
                             <thead>
                                 <tr>
-                                    <th>No. RM</th>
                                     <th>Nama</th>
                                     <th>Jenis Kelamin</th>
+                                    <th>Pekerjaan</th>
+                                    <th>Tempat Lahir</th>
                                     <th>Tanggal Lahir</th>
                                     <th>Telepon</th>
                                     <th>Alamat</th>
@@ -149,29 +150,30 @@ if ($action == 'list') {
                             <tbody>
                                 <?php foreach ($patients as $p): ?>
                                     <tr>
-                                        <td><strong><?php echo $p['no_rm']; ?></strong></td>
-                                        <td><?php echo $p['nama']; ?></td>
+                                        <td><strong><?php echo $p['nama']; ?></strong></td>
                                         <td><?php echo $p['jenis_kelamin']; ?></td>
-                                        <td><?php echo formatDate($p['tanggal_lahir']); ?></td>
-                                        <td><?php echo $p['telepon']; ?></td>
+                                        <td><?php echo $p['pekerjaan']; ?></td>
+                                        <td><?php echo $p['tmp_lahir']; ?></td>
+                                        <td><?php echo formatDate($p['tgl_lahir']); ?></td>
+                                        <td><?php echo $p['telpon']; ?></td>
                                         <td><?php echo $p['alamat']; ?></td>
-                                        <td><?php echo formatDate($p['created_at']); ?></td>
+                                        <td><?php echo formatDate($p['tgl_daftar']); ?></td>
                                         <td>
-                                            <a href="index.php?page=pasien&action=edit&id=<?php echo $p['id']; ?>" 
-                                               class="btn btn-sm btn-outline-primary">
+                                            <button type="button" class="btn btn-sm btn-outline-primary" onclick='openEditPatientModal(<?php echo json_encode($p); ?>)'>
                                                 <i class="bi bi-pencil"></i>
-                                            </a>
-                                            <button type="button" class="btn btn-sm btn-outline-danger" 
-                                                    onclick="confirmDelete(<?php echo $p['id']; ?>, '<?php echo $p['nama']; ?>')">
-                                                <i class="bi bi-trash"></i>
                                             </button>
+                                            <form method="POST" action="" style="display:inline-block;">
+                                                <input type="hidden" name="idpasien" value="<?php echo $p['idpasien']; ?>">
+                                                <button type="submit" name="action" value="delete" class="btn btn-sm btn-outline-danger" onclick="return confirm('Yakin ingin menghapus data ini?')">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
                     </div>
-                    
                     <!-- Pagination -->
                     <?php if ($pagination['total_pages'] > 1): ?>
                         <?php echo generatePagination($pagination['total_pages'], $pagination['current_page'], 'index.php?page=pasien&search=' . urlencode($search) . '&page_num'); ?>
@@ -181,121 +183,117 @@ if ($action == 'list') {
         </div>
     <?php endif; ?>
 
-    <?php if ($action == 'add' || $action == 'edit'): ?>
-        <!-- Add/Edit Form -->
-        <div class="card shadow">
-            <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">
-                    <i class="bi bi-<?php echo $action == 'add' ? 'person-plus' : 'pencil'; ?>"></i>
-                    <?php echo $action == 'add' ? 'Tambah' : 'Edit'; ?> Data Pasien
-                </h6>
-            </div>
-            <div class="card-body">
-                <?php if (!empty($errors)): ?>
-                    <div class="alert alert-danger">
-                        <ul class="mb-0">
-                            <?php foreach ($errors as $error): ?>
-                                <li><?php echo $error; ?></li>
-                            <?php endforeach; ?>
-                        </ul>
-                    </div>
-                <?php endif; ?>
-
-                <form method="POST" action="">
-                    <?php if ($action == 'edit'): ?>
-                        <input type="hidden" name="id" value="<?php echo $patient['id']; ?>">
-                    <?php endif; ?>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="nama" class="form-label">Nama Lengkap *</label>
-                                <input type="text" class="form-control" id="nama" name="nama" 
-                                       value="<?php echo $patient['nama'] ?? ''; ?>" required>
+    <!-- Add/Edit Modal -->
+    <div class="modal fade" id="pasienModal" tabindex="-1" aria-labelledby="pasienModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="pasienModalLabel">Tambah Data Pasien</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="modalError"></div>
+                    <form method="POST" action="" id="pasienForm">
+                        <input type="hidden" name="idpasien" id="idpasien">
+                        <input type="hidden" name="action" id="formAction" value="add">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="nama" class="form-label">Nama Lengkap *</label>
+                                    <input type="text" class="form-control" id="nama" name="nama" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="jenis_kelamin" class="form-label">Jenis Kelamin *</label>
+                                    <select class="form-select" id="jenis_kelamin" name="jenis_kelamin" required>
+                                        <option value="">Pilih Jenis Kelamin</option>
+                                        <option value="L">Laki-laki</option>
+                                        <option value="P">Perempuan</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="no_rm" class="form-label">Nomor Rekam Medis *</label>
-                                <input type="text" class="form-control" id="no_rm" name="no_rm" 
-                                       value="<?php echo $patient['no_rm'] ?? ''; ?>" required>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="pekerjaan" class="form-label">Pekerjaan</label>
+                                    <input type="text" class="form-control" id="pekerjaan" name="pekerjaan">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="tmp_lahir" class="form-label">Tempat Lahir</label>
+                                    <input type="text" class="form-control" id="tmp_lahir" name="tmp_lahir">
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="tanggal_lahir" class="form-label">Tanggal Lahir *</label>
-                                <input type="date" class="form-control" id="tanggal_lahir" name="tanggal_lahir" 
-                                       value="<?php echo $patient['tanggal_lahir'] ?? ''; ?>" required>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="tgl_lahir" class="form-label">Tanggal Lahir</label>
+                                    <input type="date" class="form-control" id="tgl_lahir" name="tgl_lahir">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="telpon" class="form-label">Nomor Telepon *</label>
+                                    <input type="text" class="form-control" id="telpon" name="telpon" required>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="jenis_kelamin" class="form-label">Jenis Kelamin *</label>
-                                <select class="form-select" id="jenis_kelamin" name="jenis_kelamin" required>
-                                    <option value="">Pilih Jenis Kelamin</option>
-                                    <option value="Laki-laki" <?php echo ($patient['jenis_kelamin'] ?? '') == 'Laki-laki' ? 'selected' : ''; ?>>Laki-laki</option>
-                                    <option value="Perempuan" <?php echo ($patient['jenis_kelamin'] ?? '') == 'Perempuan' ? 'selected' : ''; ?>>Perempuan</option>
-                                </select>
-                            </div>
+                        <div class="mb-3">
+                            <label for="alamat" class="form-label">Alamat</label>
+                            <textarea class="form-control" id="alamat" name="alamat"></textarea>
                         </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="telepon" class="form-label">Nomor Telepon *</label>
-                        <input type="text" class="form-control" id="telepon" name="telepon" 
-                               value="<?php echo $patient['telepon'] ?? ''; ?>" required>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="alamat" class="form-label">Alamat *</label>
-                        <textarea class="form-control" id="alamat" name="alamat" rows="3" required><?php echo $patient['alamat'] ?? ''; ?></textarea>
-                    </div>
-                    
-                    <div class="d-flex justify-content-between">
-                        <a href="index.php?page=pasien" class="btn btn-secondary">
-                            <i class="bi bi-arrow-left"></i> Kembali
-                        </a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-check"></i> <?php echo $action == 'add' ? 'Simpan' : 'Update'; ?>
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    <?php endif; ?>
-</div>
-
-<!-- Delete Confirmation Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Konfirmasi Hapus</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <p>Apakah Anda yakin ingin menghapus data pasien <strong id="patientName"></strong>?</p>
-                <p class="text-danger">Tindakan ini tidak dapat dibatalkan!</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <form method="POST" action="" style="display: inline;">
-                    <input type="hidden" name="action" value="delete">
-                    <input type="hidden" name="id" id="patientId">
-                    <button type="submit" class="btn btn-danger">Hapus</button>
-                </form>
+                        <div class="mb-3">
+                            <label for="tgl_daftar" class="form-label">Tanggal Daftar</label>
+                            <input type="date" class="form-control" id="tgl_daftar" name="tgl_daftar" value="<?php echo date('Y-m-d'); ?>">
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="submitBtn">Tambah</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-function confirmDelete(id, name) {
-    document.getElementById('patientId').value = id;
-    document.getElementById('patientName').textContent = name;
-    new bootstrap.Modal(document.getElementById('deleteModal')).show();
+function openAddPatientModal() {
+    document.getElementById('pasienModalLabel').innerText = 'Tambah Data Pasien';
+    document.getElementById('submitBtn').innerText = 'Tambah';
+    document.getElementById('pasienForm').reset();
+    document.getElementById('idpasien').value = '';
+    document.getElementById('modalError').innerHTML = '';
+    document.getElementById('formAction').value = 'add';
+    // Remove validation classes
+    var form = document.getElementById('pasienForm');
+    Array.from(form.elements).forEach(function(el) {
+        el.classList.remove('is-valid', 'is-invalid');
+    });
+}
+
+function openEditPatientModal(data) {
+    document.getElementById('pasienModalLabel').innerText = 'Edit Data Pasien';
+    document.getElementById('submitBtn').innerText = 'Simpan';
+    document.getElementById('idpasien').value = data.idpasien;
+    document.getElementById('nama').value = data.nama;
+    document.getElementById('jenis_kelamin').value = data.jenis_kelamin;
+    document.getElementById('pekerjaan').value = data.pekerjaan;
+    document.getElementById('tmp_lahir').value = data.tmp_lahir;
+    document.getElementById('tgl_lahir').value = data.tgl_lahir;
+    document.getElementById('telpon').value = data.telpon;
+    document.getElementById('alamat').value = data.alamat;
+    document.getElementById('tgl_daftar').value = data.tgl_daftar;
+    document.getElementById('modalError').innerHTML = '';
+    document.getElementById('formAction').value = 'edit';
+    // Remove validation classes
+    var form = document.getElementById('pasienForm');
+    Array.from(form.elements).forEach(function(el) {
+        el.classList.remove('is-valid', 'is-invalid');
+    });
+    var pasienModal = new bootstrap.Modal(document.getElementById('pasienModal'));
+    pasienModal.show();
 }
 </script> 
