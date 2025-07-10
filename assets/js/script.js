@@ -379,4 +379,22 @@ document.addEventListener('DOMContentLoaded', function() {
             card.classList.remove('shadow-lg');
         });
     });
+
+    var searchInput = document.getElementById('searchInput');
+    var patientsTable = document.getElementById('patientsTable');
+    if (searchInput && patientsTable) {
+        searchInput.addEventListener('input', function() {
+            var filter = searchInput.value.toLowerCase();
+            var rows = patientsTable.getElementsByTagName('tr');
+            for (var i = 1; i < rows.length; i++) { // skip header row
+                var row = rows[i];
+                var text = row.textContent.toLowerCase();
+                if (text.indexOf(filter) > -1) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        });
+    }
 }); 

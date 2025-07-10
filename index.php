@@ -16,9 +16,14 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
 $allowed_pages = [
     'dashboard',
     'pasien',
+    'pasien_add', // allow dedicated add patient page
     'tindakan',
+    'tindakan_add',
+    'tindakan_edit',
     'rekam_medis',
     'dokter',
+    'dokter_add',
+    'dokter_edit',
     'ruang',
     'logout'
 ];

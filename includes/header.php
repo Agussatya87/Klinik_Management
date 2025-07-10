@@ -16,8 +16,8 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-3">
         <div class="container-fluid">
-            <a class="navbar-brand d-flex align-items-center gap-2" href="index.php">
-                <img src="assets/logo.jpg" alt="Logo" width="48" height="48" class="me-2" style="object-fit:contain;">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="/Klinik_Management/index.php">
+                <img src="/Klinik_Management/assets/logo.jpg" alt="Logo" width="48" height="48" class="me-2" style="object-fit:contain;">
                 <span class="fw-bold fs-4 text-dark">Klinik Management System</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -26,38 +26,38 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item">
-                        <a class="nav-link px-3 fw-semibold d-flex align-items-center gap-1 <?php echo ($page == 'dashboard') ? 'active' : ''; ?>" href="index.php">
+                        <a class="nav-link px-3 fw-semibold d-flex align-items-center gap-1 <?php echo ($page == 'dashboard') ? 'active' : ''; ?>" href="/Klinik_Management/index.php">
                             <i class="bi bi-activity"></i> Dashboard
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link px-3 fw-semibold d-flex align-items-center gap-1 <?php echo ($page == 'pasien') ? 'active' : ''; ?>" href="index.php?page=pasien">
+                        <a class="nav-link px-3 fw-semibold d-flex align-items-center gap-1 <?php echo ($page == 'pasien') ? 'active' : ''; ?>" href="/Klinik_Management/index.php?page=pasien">
                             <i class="bi bi-people"></i> Data Pasien
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link px-3 fw-semibold d-flex align-items-center gap-1 <?php echo ($page == 'tindakan') ? 'active' : ''; ?>" href="index.php?page=tindakan">
+                        <a class="nav-link px-3 fw-semibold d-flex align-items-center gap-1 <?php echo ($page == 'tindakan') ? 'active' : ''; ?>" href="/Klinik_Management/index.php?page=tindakan">
                             <i class="bi bi-calendar2-check"></i> Tindakan Medis
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link px-3 fw-semibold d-flex align-items-center gap-1 <?php echo ($page == 'rekam_medis') ? 'active' : ''; ?>" href="index.php?page=rekam_medis">
+                        <a class="nav-link px-3 fw-semibold d-flex align-items-center gap-1 <?php echo ($page == 'rekam_medis') ? 'active' : ''; ?>" href="/Klinik_Management/index.php?page=rekam_medis">
                             <i class="bi bi-file-earmark-medical"></i> Rekam Medis
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link px-3 fw-semibold d-flex align-items-center gap-1 <?php echo ($page == 'dokter') ? 'active' : ''; ?>" href="index.php?page=dokter">
+                        <a class="nav-link px-3 fw-semibold d-flex align-items-center gap-1 <?php echo ($page == 'dokter') ? 'active' : ''; ?>" href="/Klinik_Management/index.php?page=dokter">
                             <i class="bi bi-person-badge"></i> Data Dokter
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link px-3 fw-semibold d-flex align-items-center gap-1 <?php echo ($page == 'ruang') ? 'active' : ''; ?>" href="index.php?page=ruang">
+                        <a class="nav-link px-3 fw-semibold d-flex align-items-center gap-1 <?php echo ($page == 'ruang') ? 'active' : ''; ?>" href="/Klinik_Management/index.php?page=ruang">
                             <i class="bi bi-buildings"></i> Ruangan
                         </a>
                     </li>
                 </ul>
                 <div class="d-flex align-items-center gap-2">
-                    <a href="index.php?page=logout" class="btn btn-outline-secondary rounded-3 px-4 fw-semibold">
+                    <a href="/Klinik_Management/index.php?page=logout" class="btn btn-outline-secondary rounded-3 px-4 fw-semibold">
                         <i class="bi bi-box-arrow-right"></i> Logout
                     </a>
                 </div>
