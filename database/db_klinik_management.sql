@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 08, 2025 at 09:43 AM
+-- Generation Time: Jul 12, 2025 at 10:44 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -36,6 +36,14 @@ CREATE TABLE `dokter` (
   `spesialisasi` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `dokter`
+--
+
+INSERT INTO `dokter` (`iddokter`, `nama`, `jenis_kelamin`, `telpon`, `alamat`, `spesialisasi`) VALUES
+(1, 'Toni', 'L', '081762538264', 'Jl. Mekar No. 9', 'Dokter Umum'),
+(2, 'sadasda', 'L', '131411', 'adadad', 'adada');
+
 -- --------------------------------------------------------
 
 --
@@ -59,7 +67,11 @@ CREATE TABLE `pasien` (
 --
 
 INSERT INTO `pasien` (`idpasien`, `nama`, `jenis_kelamin`, `pekerjaan`, `tmp_lahir`, `tgl_lahir`, `telpon`, `alamat`, `tgl_daftar`) VALUES
-(1, 'Tono', 'L', 'Chef', 'Mataram', '2000-01-18', '087123456789', 'Jl. Merdeka no 11', '2025-07-06');
+(1, 'Tono', 'L', 'Chef', 'Singapore', '2000-01-18', '081131313131', 'Jl. Merdeka no 13', '2025-07-06'),
+(18, 'Fanny', 'P', 'Web Developer', 'Bali', '2002-06-20', '0817625382639', 'Jl. Mawar No. 2', '2025-07-11'),
+(22, 'Dede', 'L', 'Data Scientist', 'Mataram', '2002-01-05', '081625372638', 'Jl. Belimbing No. 1', '2025-07-11'),
+(24, 'Pores', 'P', 'Perawat', 'Sumatra Utara', '2010-06-24', '081525232523', 'Jl. Mekar Sari No. 78', '2025-07-12'),
+(25, 'Jarwo', 'L', 'Anggota Ormas', 'Jawa', '1980-09-23', '085917236471', 'Jl. Melayu No. 99', '2025-07-12');
 
 -- --------------------------------------------------------
 
@@ -88,6 +100,15 @@ CREATE TABLE `ruang` (
   `status` enum('Kosong','Terisi') DEFAULT 'Kosong'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `ruang`
+--
+
+INSERT INTO `ruang` (`idruang`, `nama_ruang`, `status`) VALUES
+(3, 'Ekonomi', 'Kosong'),
+(4, 'Bussines', 'Kosong'),
+(5, 'Ekonomi Plus', 'Kosong');
+
 -- --------------------------------------------------------
 
 --
@@ -99,10 +120,20 @@ CREATE TABLE `tindakan` (
   `idpasien` int(11) NOT NULL,
   `kriteria` text DEFAULT NULL,
   `tindakan` text DEFAULT NULL,
-  `dokter` varchar(100) DEFAULT NULL,
+  `iddokter` int(11) DEFAULT NULL,
   `fasilitas` text DEFAULT NULL,
   `keputusan_keluarga` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tindakan`
+--
+
+INSERT INTO `tindakan` (`idtindakan`, `idpasien`, `kriteria`, `tindakan`, `iddokter`, `fasilitas`, `keputusan_keluarga`) VALUES
+(1, 22, 'ad', 'sada', 1, 'ICU', 'sadasd'),
+(2, 18, 'sadda', 'adad', 1, 'Laboratory', 'adada'),
+(3, 1, 'sasa', 'dfdfd', 1, 'ICU', 'setuju'),
+(4, 24, 'Sakit Hati', 'Tidur', 1, 'Pharmacy', 'Setuju');
 
 -- --------------------------------------------------------
 
@@ -160,7 +191,8 @@ ALTER TABLE `ruang`
 --
 ALTER TABLE `tindakan`
   ADD PRIMARY KEY (`idtindakan`),
-  ADD KEY `idpasien` (`idpasien`);
+  ADD KEY `idpasien` (`idpasien`),
+  ADD KEY `fk_tindakan_dokter` (`iddokter`);
 
 --
 -- Indexes for table `users`
@@ -176,31 +208,31 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `dokter`
 --
 ALTER TABLE `dokter`
-  MODIFY `iddokter` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `iddokter` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `pasien`
 --
 ALTER TABLE `pasien`
-  MODIFY `idpasien` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `idpasien` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `rekam_medis`
 --
 ALTER TABLE `rekam_medis`
-  MODIFY `idrm` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `idrm` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `ruang`
 --
 ALTER TABLE `ruang`
-  MODIFY `idruang` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `idruang` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `tindakan`
 --
 ALTER TABLE `tindakan`
-  MODIFY `idtindakan` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `idtindakan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -225,6 +257,7 @@ ALTER TABLE `rekam_medis`
 -- Constraints for table `tindakan`
 --
 ALTER TABLE `tindakan`
+  ADD CONSTRAINT `fk_tindakan_dokter` FOREIGN KEY (`iddokter`) REFERENCES `dokter` (`iddokter`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `tindakan_ibfk_1` FOREIGN KEY (`idpasien`) REFERENCES `pasien` (`idpasien`);
 COMMIT;
 

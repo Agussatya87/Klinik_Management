@@ -21,6 +21,8 @@ $allowed_pages = [
     'tindakan_add',
     'tindakan_edit',
     'rekam_medis',
+    'rekam_medis_add',
+    'rekam_medis_edit',
     'dokter',
     'dokter_add',
     'dokter_edit',

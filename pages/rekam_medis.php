@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../includes/functions.php';
 $action = isset($_GET['action']) ? $_GET['action'] : 'list';
 $search = isset($_GET['search']) ? sanitizeInput($_GET['search']) : '';
 $page_num = isset($_GET['page_num']) ? (int)$_GET['page_num'] : 1;
@@ -57,13 +59,19 @@ if ($action == 'list') {
     $params = [];
 
     if (!empty($search)) {
-        $where_clause = "WHERE diagnosis LIKE ?";
+        $where_clause = "WHERE p.nama LIKE ? OR d.nama LIKE ? OR r.nama_ruang LIKE ? OR t.tindakan LIKE ? OR rm.diagnosis LIKE ?";
         $search_param = "%{$search}%";
-        $params = [$search_param];
+        $params = [$search_param, $search_param, $search_param, $search_param, $search_param];
     }
 
     // Get total records for pagination
-    $count_sql = "SELECT COUNT(*) as total FROM rekam_medis " . $where_clause;
+    $count_sql = "SELECT COUNT(*) as total
+        FROM rekam_medis rm
+        JOIN pasien p ON rm.idpasien = p.idpasien
+        JOIN dokter d ON rm.iddokter = d.iddokter
+        LEFT JOIN ruang r ON rm.idruang = r.idruang
+        LEFT JOIN tindakan t ON rm.idtindakan = t.idtindakan
+        {$where_clause}";
     $total_result = fetchOne($count_sql, $params);
     $total_records = $total_result['total'];
 
@@ -72,7 +80,7 @@ if ($action == 'list') {
     $pagination = getPagination($total_records, $records_per_page, $page_num);
 
     // Get medical records
-    $sql = "SELECT rm.*, p.nama as nama_pasien, d.nama as nama_dokter, r.nama_ruang, t.tindakan as nama_tindakan
+    $sql = "SELECT rm.*, p.nama as nama_pasien, d.nama as nama_dokter, r.nama_ruang, t.tindakan as tindakan
             FROM rekam_medis rm
             JOIN pasien p ON rm.idpasien = p.idpasien
             JOIN dokter d ON rm.iddokter = d.iddokter
@@ -97,7 +105,7 @@ $tindakans = fetchAll("SELECT idtindakan, tindakan FROM tindakan ORDER BY tindak
         <h1 class="h3 mb-0">
             <i class="bi bi-file-earmark-medical text-primary"></i> Data Rekam Medis
         </h1>
-        <a href="index.php?page=rekam_medis&action=add" class="btn btn-primary">
+        <a href="/Klinik_Management/index.php?page=rekam_medis_add" class="btn btn-primary">
             <i class="bi bi-plus-circle"></i> Tambah Rekam Medis
         </a>
     </div>
@@ -111,7 +119,7 @@ $tindakans = fetchAll("SELECT idtindakan, tindakan FROM tindakan ORDER BY tindak
             <div class="card-header">
                 <form class="d-flex" method="get" action="">
                     <input type="hidden" name="page" value="rekam_medis">
-                    <input type="text" name="search" class="form-control me-2" placeholder="Cari diagnosis..." value="<?php echo htmlspecialchars($search); ?>">
+                    <input type="text" name="search" class="form-control me-2" placeholder="Cari pasien, dokter, ruang, tindakan, atau diagnosis..." value="<?php echo htmlspecialchars($search); ?>">
                     <button class="btn btn-outline-primary" type="submit">Cari</button>
                 </form>
             </div>
@@ -130,23 +138,26 @@ $tindakans = fetchAll("SELECT idtindakan, tindakan FROM tindakan ORDER BY tindak
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($medical_records as $rm): ?>
+                            <?php if (empty($medical_records)): ?>
                                 <tr>
-                                    <td><?php echo $rm['idrm']; ?></td>
-                                    <td><?php echo $rm['nama_pasien']; ?></td>
-                                    <td><?php echo $rm['nama_dokter']; ?></td>
-                                    <td><?php echo $rm['nama_ruang']; ?></td>
-                                    <td><?php echo $rm['nama_tindakan']; ?></td>
-                                    <td><?php echo $rm['diagnosis']; ?></td>
-                                    <td>
-                                        <a href="index.php?page=rekam_medis&action=edit&idrm=<?php echo $rm['idrm']; ?>" class="btn btn-sm btn-warning">Edit</a>
-                                        <form method="POST" action="" style="display:inline-block;">
-                                            <input type="hidden" name="idrm" value="<?php echo $rm['idrm']; ?>">
-                                            <button type="submit" name="action" value="delete" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus data ini?')">Hapus</button>
-                                        </form>
-                                    </td>
+                                    <td colspan="7" class="text-center text-muted">Tidak ada data rekam medis</td>
                                 </tr>
-                            <?php endforeach; ?>
+                            <?php else: ?>
+                                <?php foreach ($medical_records as $rm): ?>
+                                    <tr>
+                                        <td><?php echo $rm['idrm']; ?></td>
+                                        <td><?php echo $rm['nama_pasien']; ?></td>
+                                        <td><?php echo $rm['nama_dokter']; ?></td>
+                                        <td><?php echo $rm['nama_ruang']; ?></td>
+                                        <td><?php echo $rm['tindakan']; ?></td>
+                                        <td><?php echo $rm['diagnosis']; ?></td>
+                                        <td>
+                                            <a href="/Klinik_Management/pages/rekam_medis_edit.php?idrm=<?php echo $rm['idrm']; ?>" class="btn btn-sm btn-warning">Edit</a>
+                                            <a href="/Klinik_Management/pages/rekam_medis_delete.php?idrm=<?php echo $rm['idrm']; ?>" class="btn btn-sm btn-danger">Hapus</a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
@@ -194,7 +205,7 @@ $tindakans = fetchAll("SELECT idtindakan, tindakan FROM tindakan ORDER BY tindak
                         <select class="form-select" id="idtindakan" name="idtindakan">
                             <option value="">Pilih Tindakan</option>
                             <?php foreach ($tindakans as $t): ?>
-                                <option value="<?php echo $t['idtindakan']; ?>" <?php echo ($rekam_medis['idtindakan'] ?? '') == $t['idtindakan'] ? 'selected' : ''; ?>><?php echo $t['nama_tindakan']; ?></option>
+                                <option value="<?php echo $t['idtindakan']; ?>" <?php echo ($rekam_medis['idtindakan'] ?? '') == $t['idtindakan'] ? 'selected' : ''; ?>><?php echo $t['tindakan']; ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>

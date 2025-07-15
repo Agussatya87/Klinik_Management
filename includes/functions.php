@@ -101,4 +101,38 @@ function generatePagination($total_pages, $current_page, $base_url) {
     $html .= '</ul></nav>';
     return $html;
 }
+
+// Room status management functions
+function updateRoomStatus($idruang, $status) {
+    if ($idruang) {
+        $sql = "UPDATE ruang SET status = ? WHERE idruang = ?";
+        executeQuery($sql, [$status, $idruang]);
+    }
+}
+
+function updateRoomStatusOnMedicalRecordChange($old_ruang_id, $new_ruang_id) {
+    // If there was a previous room, check if it's still being used
+    if ($old_ruang_id) {
+        $check_old_room = "SELECT COUNT(*) as count FROM rekam_medis WHERE idruang = ?";
+        $old_room_count = fetchOne($check_old_room, [$old_ruang_id]);
+        
+        if ($old_room_count['count'] == 0) {
+            // No other medical records using this room, set it to empty
+            updateRoomStatus($old_ruang_id, 'Kosong');
+        }
+    }
+    
+    // If there's a new room, set it to occupied
+    if ($new_ruang_id) {
+        updateRoomStatus($new_ruang_id, 'Terisi');
+    }
+}
+
+function getAvailableRooms() {
+    return fetchAll("SELECT idruang, nama_ruang FROM ruang WHERE status = 'Kosong' ORDER BY nama_ruang");
+}
+
+function getAllRooms() {
+    return fetchAll("SELECT idruang, nama_ruang, status FROM ruang ORDER BY nama_ruang");
+}
 ?> 

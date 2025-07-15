@@ -62,7 +62,7 @@ if ($isAjax) {
                             <a href="pages/pasien_edit.php?idpasien=<?php echo $p['idpasien']; ?>" class="btn btn-sm btn-outline-primary">
                                 <i class="bi bi-pencil"></i>
                             </a>
-                            <a href="pages/pasien_delete.php?idpasien=<?php echo $p['idpasien']; ?>&confirm=yes" class="btn btn-sm btn-outline-danger" onclick="return confirm('Yakin ingin menghapus data ini?')">
+                            <a href="pages/pasien_delete.php?idpasien=<?php echo $p['idpasien']; ?>" class="btn btn-sm btn-outline-danger">
                                 <i class="bi bi-trash"></i>
                             </a>
                         </td>
@@ -162,7 +162,7 @@ if ($isAjax) {
                                         <a href="pages/pasien_edit.php?idpasien=<?php echo $p['idpasien']; ?>" class="btn btn-sm btn-outline-primary">
                                             <i class="bi bi-pencil"></i>
                                         </a>
-                                        <a href="pages/pasien_delete.php?idpasien=<?php echo $p['idpasien']; ?>&confirm=yes" class="btn btn-sm btn-outline-danger" onclick="return confirm('Yakin ingin menghapus data ini?')">
+                                        <a href="pages/pasien_delete.php?idpasien=<?php echo $p['idpasien']; ?>" class="btn btn-sm btn-outline-danger">
                                             <i class="bi bi-trash"></i>
                                         </a>
                                     </td>

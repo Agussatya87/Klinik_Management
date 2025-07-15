@@ -1,400 +1,196 @@
-// Klinik Management System JavaScript
+(function () {
+    'use strict';
 
-document.addEventListener('DOMContentLoaded', function() {
-    
-    // Initialize tooltips
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
+    const $ = (sel, ctx = document) => ctx.querySelector(sel);
+    const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
 
-    // Initialize popovers
-    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
-    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
-        return new bootstrap.Popover(popoverTriggerEl);
-    });
-
-    // Auto-hide alerts after 5 seconds
-    setTimeout(function() {
-        var alerts = document.querySelectorAll('.alert');
-        alerts.forEach(function(alert) {
-            var bsAlert = new bootstrap.Alert(alert);
-            bsAlert.close();
-        });
-    }, 5000);
-
-    // Form validation
-    var forms = document.querySelectorAll('.needs-validation');
-    Array.prototype.slice.call(forms).forEach(function(form) {
-        form.addEventListener('submit', function(event) {
-            if (!form.checkValidity()) {
-                event.preventDefault();
-                event.stopPropagation();
-            }
-            form.classList.add('was-validated');
-        }, false);
-    });
-
-    // Search functionality enhancement
-    var searchInputs = document.querySelectorAll('input[name="search"]');
-    searchInputs.forEach(function(input) {
-        input.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.target.closest('form').submit();
-            }
-        });
-    });
-
-    // Table row selection
-    var tableRows = document.querySelectorAll('.table tbody tr');
-    tableRows.forEach(function(row) {
-        row.addEventListener('click', function(e) {
-            if (!e.target.closest('td:last-child')) {
-                this.classList.toggle('table-active');
-            }
-        });
-    });
-
-    // Dynamic form field validation
-    function validateFormField(field) {
-        var value = field.value.trim();
-        var isValid = true;
-        var errorMessage = '';
-
-        // Remove existing validation classes
-        field.classList.remove('is-valid', 'is-invalid');
-
-        // Check if field is required
-        if (field.hasAttribute('required') && value === '') {
-            isValid = false;
-            errorMessage = 'Field ini wajib diisi';
-        }
-
-        // Email validation
-        if (field.type === 'email' && value !== '') {
-            var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(value)) {
-                isValid = false;
-                errorMessage = 'Format email tidak valid';
-            }
-        }
-
-        // Phone number validation
-        if (field.name === 'telepon' && value !== '') {
-            var phoneRegex = /^[\d\s\-\+\(\)]+$/;
-            if (!phoneRegex.test(value)) {
-                isValid = false;
-                errorMessage = 'Format nomor telepon tidak valid';
-            }
-        }
-
-        // Number validation
-        if (field.type === 'number' && value !== '') {
-            if (field.hasAttribute('min') && parseFloat(value) < parseFloat(field.getAttribute('min'))) {
-                isValid = false;
-                errorMessage = 'Nilai minimum adalah ' + field.getAttribute('min');
-            }
-            if (field.hasAttribute('max') && parseFloat(value) > parseFloat(field.getAttribute('max'))) {
-                isValid = false;
-                errorMessage = 'Nilai maksimum adalah ' + field.getAttribute('max');
-            }
-        }
-
-        // Apply validation classes
-        if (isValid) {
-            field.classList.add('is-valid');
-        } else {
-            field.classList.add('is-invalid');
-            // Show error message
-            var errorDiv = field.parentNode.querySelector('.invalid-feedback');
-            if (errorDiv) {
-                errorDiv.textContent = errorMessage;
-            }
-        }
-
-        return isValid;
+    // 🔁 UI Bootstrap
+    function initBootstrapUI() {
+        $$('[data-bs-toggle="tooltip"]').forEach(el => new bootstrap.Tooltip(el));
+        $$('[data-bs-toggle="popover"]').forEach(el => new bootstrap.Popover(el));
     }
 
-    // Add validation to form fields
-    var formFields = document.querySelectorAll('input, select, textarea');
-    formFields.forEach(function(field) {
-        field.addEventListener('blur', function() {
-            validateFormField(this);
+    // ⏳ Loading on Submit
+    function setupSubmitLoading() {
+        $$('form button[type="submit"]').forEach(button => {
+            const form = button.closest('form');
+            button.addEventListener('click', () => {
+                if (form && form.checkValidity()) {
+                    button.disabled = true;
+                    button.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Menyimpan...';
+                }
+            });
         });
-
-        field.addEventListener('input', function() {
-            if (this.classList.contains('is-invalid')) {
-                validateFormField(this);
-            }
-        });
-    });
-
-    // Confirm delete functionality
-    window.confirmDelete = function(id, name) {
-        var modal = document.getElementById('deleteModal');
-        if (modal) {
-            var nameElement = modal.querySelector('#patientName, #procedureName, #diagnosisName, #doctorName, #roomName');
-            var idElement = modal.querySelector('#patientId, #procedureId, #diagnosisId, #doctorId, #roomId');
-            
-            if (nameElement) nameElement.textContent = name;
-            if (idElement) idElement.value = id;
-            
-            var bsModal = new bootstrap.Modal(modal);
-            bsModal.show();
-        }
-    };
-
-    // Loading state for buttons
-    var submitButtons = document.querySelectorAll('button[type="submit"]');
-    submitButtons.forEach(function(button) {
-        button.addEventListener('click', function() {
-            if (this.closest('form').checkValidity()) {
-                this.disabled = true;
-                this.innerHTML = '<span class="loading"></span> Loading...';
-            }
-        });
-    });
-
-    // Auto-generate patient number
-    var patientForm = document.querySelector('form[action*="pasien"]');
-    if (patientForm) {
-        var noRmField = patientForm.querySelector('input[name="no_rm"]');
-        if (noRmField && !noRmField.value) {
-            // Generate RM number based on current date and time
-            var now = new Date();
-            var year = now.getFullYear();
-            var month = String(now.getMonth() + 1).padStart(2, '0');
-            var day = String(now.getDate()).padStart(2, '0');
-            var time = String(now.getHours()).padStart(2, '0') + String(now.getMinutes()).padStart(2, '0');
-            var rmNumber = 'RM' + year + month + day + time;
-            noRmField.value = rmNumber;
-        }
     }
 
-    // Date picker enhancement
-    var dateInputs = document.querySelectorAll('input[type="date"]');
-    dateInputs.forEach(function(input) {
-        if (!input.value) {
-            input.value = new Date().toISOString().split('T')[0];
-        }
-    });
+    // ⚠️ Form Validasi
+    function setupFormValidation() {
+        $$('.needs-validation').forEach(form => {
+            form.addEventListener('submit', e => {
+                if (!form.checkValidity()) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            });
+        });
+    }
 
-    // Time picker enhancement
-    var timeInputs = document.querySelectorAll('input[type="time"]');
-    timeInputs.forEach(function(input) {
-        if (!input.value) {
-            var now = new Date();
-            var hours = String(now.getHours()).padStart(2, '0');
-            var minutes = String(now.getMinutes()).padStart(2, '0');
-            input.value = hours + ':' + minutes;
-        }
-    });
+    // 🗑️ Auto Dismiss Alert
+    function autoDismissAlerts(timeout = 5000) {
+        setTimeout(() => {
+            $$('.alert').forEach(a => new bootstrap.Alert(a).close());
+        }, timeout);
+    }
 
-    // Print functionality
-    window.printPage = function() {
-        window.print();
+    // 📅 Default Tanggal/Waktu
+    function defaultDateTime() {
+        const now = new Date();
+        const today = now.toISOString().split('T')[0];
+
+        $$('input[type="date"]').forEach(input => {
+            if (!input.value) input.value = today;
+        });
+
+        $$('input[type="time"]').forEach(input => {
+            if (!input.value) {
+                input.value = now.toLocaleTimeString('it-IT', {
+                    hour: '2-digit', minute: '2-digit'
+                });
+            }
+        });
+    }
+
+    // 💾 Auto Save Form ke LocalStorage
+    function autoSaveForms() {
+        $$('form').forEach(form => {
+            const formId = form.id || `form_${Math.random().toString(36).slice(2, 9)}`;
+            form.id = formId;
+
+            const saved = localStorage.getItem('form_' + formId);
+            if (saved) {
+                Object.entries(JSON.parse(saved)).forEach(([k, v]) => {
+                    const f = form.elements.namedItem(k);
+                    if (f && !f.value) f.value = v;
+                });
+            }
+
+            form.addEventListener('input', () => {
+                const data = {};
+                Array.from(form.elements).forEach(e => {
+                    if (e.name) data[e.name] = e.value;
+                });
+                localStorage.setItem('form_' + formId, JSON.stringify(data));
+            });
+
+            form.addEventListener('submit', () => {
+                localStorage.removeItem('form_' + formId);
+            });
+        });
+    }
+
+    // 🖱️ Highlight Table Baris
+    function enableRowHighlight() {
+        $$('.table tbody tr').forEach(row => {
+            row.addEventListener('click', e => {
+                if (!e.target.closest('td:last-child')) {
+                    row.classList.toggle('table-active');
+                }
+            });
+        });
+    }
+
+    // 🔎 Search Submit on Enter
+    function setupSearchSubmit() {
+        $$('input[name="search"]').forEach(input => {
+            input.addEventListener('keypress', e => {
+                if (e.key === 'Enter') input.closest('form').submit();
+            });
+        });
+    }
+
+    // 🗑️ Konfirmasi Hapus (modal dinamis)
+    window.confirmDelete = function (id, name) {
+        const modal = $('#deleteModal');
+        if (!modal) return;
+
+        const nameSpan = modal.querySelector('#patientName, #procedureName, #diagnosisName, #doctorName, #roomName');
+        const idInput = modal.querySelector('#patientId, #procedureId, #diagnosisId, #doctorId, #roomId');
+
+        if (nameSpan) nameSpan.textContent = name;
+        if (idInput) idInput.value = id;
+
+        new bootstrap.Modal(modal).show();
     };
 
-    // Export to CSV functionality
-    window.exportToCSV = function(tableId, filename) {
-        var table = document.getElementById(tableId);
+    // 📤 Export Table ke CSV
+    window.exportToCSV = function (tableId, filename) {
+        const table = document.getElementById(tableId);
         if (!table) return;
 
-        var csv = [];
-        var rows = table.querySelectorAll('tr');
+        const rows = Array.from(table.querySelectorAll('tr'));
+        const csv = rows.map(row =>
+            Array.from(row.querySelectorAll('td, th')).map(cell => {
+                let text = cell.textContent.trim();
+                if (text.includes(',')) text = `"${text.replace(/"/g, '""')}"`;
+                return text;
+            }).join(',')
+        ).join('\n');
 
-        for (var i = 0; i < rows.length; i++) {
-            var row = [], cols = rows[i].querySelectorAll('td, th');
-            
-            for (var j = 0; j < cols.length; j++) {
-                // Get text content without HTML tags
-                var text = cols[j].textContent || cols[j].innerText;
-                // Escape quotes and wrap in quotes if contains comma
-                if (text.includes(',')) {
-                    text = '"' + text.replace(/"/g, '""') + '"';
-                }
-                row.push(text);
-            }
-            
-            csv.push(row.join(','));
-        }
-
-        var csvContent = csv.join('\n');
-        var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        var link = document.createElement('a');
-        
-        if (link.download !== undefined) {
-            var url = URL.createObjectURL(blob);
-            link.setAttribute('href', url);
-            link.setAttribute('download', filename + '.csv');
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `${filename}.csv`;
+        link.click();
     };
 
-    // Responsive table enhancement
-    var tables = document.querySelectorAll('.table-responsive');
-    tables.forEach(function(table) {
-        var wrapper = table.parentNode;
-        if (wrapper && wrapper.classList.contains('card-body')) {
-            wrapper.style.overflowX = 'auto';
-        }
-    });
-
-    // Keyboard shortcuts
-    document.addEventListener('keydown', function(e) {
-        // Ctrl/Cmd + N for new record
-        if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
-            e.preventDefault();
-            var addButton = document.querySelector('a[href*="action=add"]');
-            if (addButton) {
-                window.location.href = addButton.href;
+    // ⌨️ Keyboard Shortcuts
+    function setupKeyboardShortcuts() {
+        document.addEventListener('keydown', e => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+                e.preventDefault();
+                const link = $('a[href*="action=add"]');
+                if (link) window.location.href = link.href;
             }
-        }
-        
-        // Ctrl/Cmd + F for search
-        if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
-            e.preventDefault();
-            var searchInput = document.querySelector('input[name="search"]');
-            if (searchInput) {
-                searchInput.focus();
+            if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+                e.preventDefault();
+                $('input[name="search"]')?.focus();
             }
-        }
-        
-        // Escape key to close modals
-        if (e.key === 'Escape') {
-            var modals = document.querySelectorAll('.modal.show');
-            modals.forEach(function(modal) {
-                var bsModal = bootstrap.Modal.getInstance(modal);
-                if (bsModal) {
-                    bsModal.hide();
-                }
-            });
-        }
-    });
-
-    // Smooth scrolling for anchor links
-    var anchorLinks = document.querySelectorAll('a[href^="#"]');
-    anchorLinks.forEach(function(link) {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            var target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
+            if (e.key === 'Escape') {
+                $$('.modal.show').forEach(modal => {
+                    const instance = bootstrap.Modal.getInstance(modal);
+                    if (instance) instance.hide();
                 });
             }
         });
-    });
+    }
 
-    // Auto-save form data to localStorage
-    var forms = document.querySelectorAll('form');
-    forms.forEach(function(form) {
-        var formId = form.id || 'form_' + Math.random().toString(36).substr(2, 9);
-        form.id = formId;
-        
-        // Load saved data
-        var savedData = localStorage.getItem('form_' + formId);
-        if (savedData) {
-            var data = JSON.parse(savedData);
-            Object.keys(data).forEach(function(key) {
-                var field = form.querySelector('[name="' + key + '"]');
-                if (field && !field.value) {
-                    field.value = data[key];
-                }
-            });
-        }
-        
-        // Save data on input
-        var inputs = form.querySelectorAll('input, select, textarea');
-        inputs.forEach(function(input) {
-            input.addEventListener('input', function() {
-                var formData = {};
-                inputs.forEach(function(field) {
-                    if (field.name) {
-                        formData[field.name] = field.value;
-                    }
-                });
-                localStorage.setItem('form_' + formId, JSON.stringify(formData));
-            });
-        });
-        
-        // Clear saved data on successful submit
-        form.addEventListener('submit', function() {
-            localStorage.removeItem('form_' + formId);
-        });
-    });
-
-    console.log('Klinik Management System initialized successfully!');
-}); 
-
-// Responsive enhancements for mobile
-
-document.addEventListener('DOMContentLoaded', function() {
-    // 1. Auto-collapse navbar on nav-link click (mobile)
-    var navbarCollapse = document.getElementById('navbarNav');
-    if (navbarCollapse) {
-        var navLinks = navbarCollapse.querySelectorAll('.nav-link');
-        navLinks.forEach(function(link) {
-            link.addEventListener('click', function() {
-                if (window.innerWidth < 992) {
-                    var bsCollapse = bootstrap.Collapse.getOrCreateInstance(navbarCollapse);
-                    bsCollapse.hide();
+    // 🎯 Scroll Smooth Internal Anchor
+    function setupSmoothScroll() {
+        $$('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', e => {
+                const target = $(anchor.getAttribute('href'));
+                if (target) {
+                    e.preventDefault();
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
             });
         });
     }
 
-    // 2. Dynamic font resize for dashboard cards on very small screens
-    function adjustDashboardCardFont() {
-        var cards = document.querySelectorAll('.dashboard-cards .card');
-        if (window.innerWidth < 400) {
-            cards.forEach(function(card) {
-                card.style.fontSize = '0.92rem';
-            });
-        } else {
-            cards.forEach(function(card) {
-                card.style.fontSize = '';
-            });
-        }
+    // 🚀 Inisialisasi Utama
+    function init() {
+        initBootstrapUI();
+        setupFormValidation();
+        setupSubmitLoading();
+        autoDismissAlerts();
+        defaultDateTime();
+        autoSaveForms();
+        enableRowHighlight();
+        setupSearchSubmit();
+        setupKeyboardShortcuts();
+        setupSmoothScroll();
     }
-    window.addEventListener('resize', adjustDashboardCardFont);
-    adjustDashboardCardFont();
 
-    // 3. Touch feedback (ripple effect) for dashboard cards
-    var dashboardCards = document.querySelectorAll('.dashboard-cards .card');
-    dashboardCards.forEach(function(card) {
-        card.addEventListener('touchstart', function(e) {
-            card.classList.add('shadow-lg');
-        });
-        card.addEventListener('touchend', function(e) {
-            setTimeout(function() {
-                card.classList.remove('shadow-lg');
-            }, 180);
-        });
-        card.addEventListener('touchcancel', function(e) {
-            card.classList.remove('shadow-lg');
-        });
-    });
-
-    var searchInput = document.getElementById('searchInput');
-    var patientsTable = document.getElementById('patientsTable');
-    if (searchInput && patientsTable) {
-        searchInput.addEventListener('input', function() {
-            var filter = searchInput.value.toLowerCase();
-            var rows = patientsTable.getElementsByTagName('tr');
-            for (var i = 1; i < rows.length; i++) { // skip header row
-                var row = rows[i];
-                var text = row.textContent.toLowerCase();
-                if (text.indexOf(filter) > -1) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            }
-        });
-    }
-}); 
+    document.addEventListener('DOMContentLoaded', init);
+})();

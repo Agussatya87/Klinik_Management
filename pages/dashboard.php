@@ -20,9 +20,13 @@ $recent_patients = fetchAll($sql);
 $sql = "SELECT t.*, p.nama as nama_pasien, d.nama as nama_dokter 
         FROM tindakan t 
         JOIN pasien p ON t.idpasien = p.idpasien 
-        LEFT JOIN dokter d ON t.dokter = d.nama 
+        LEFT JOIN dokter d ON t.iddokter = d.iddokter 
         ORDER BY t.idtindakan DESC LIMIT 5";
 $recent_procedures = fetchAll($sql);
+
+// Get available rooms
+$sql = "SELECT COUNT(*) as total FROM ruang WHERE status = 'Kosong'";
+$available_rooms_count = fetchOne($sql);
 ?>
 
 <div class="container-fluid">
@@ -43,21 +47,10 @@ $recent_procedures = fetchAll($sql);
             <div class="col-12 col-sm-6 col-md-3">
                 <div class="card shadow-sm h-100 border-0">
                     <div class="card-body d-flex align-items-center gap-3">
-                        <i class="bi bi-activity fs-1 text-success"></i>
-                        <div>
-                            <div class="fw-semibold text-secondary">Tindakan Hari Ini</div>
-                            <div class="fs-3 fw-bold text-dark">-</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-sm-6 col-md-3">
-                <div class="card shadow-sm h-100 border-0">
-                    <div class="card-body d-flex align-items-center gap-3">
-                        <i class="bi bi-building fs-1 text-purple" style="color:#7c3aed;"></i>
+                        <i class="bi bi-buildings fs-1 text-purple" style="color:#7c3aed;"></i>
                         <div>
                             <div class="fw-semibold text-secondary">Ruang Tersedia</div>
-                            <div class="fs-3 fw-bold text-dark">-</div>
+                            <div class="fs-3 fw-bold text-dark"><?php echo $available_rooms_count['total']; ?></div>
                         </div>
                     </div>
                 </div>
@@ -75,4 +68,4 @@ $recent_procedures = fetchAll($sql);
             </div>
         </div>
     </div>
-</div> 
+</div>

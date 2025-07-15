@@ -42,6 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 }
+require_once __DIR__ . '/../includes/header.php';
 ?>
 <div class="container mt-4">
     <div class="row justify-content-center">
@@ -94,4 +95,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
     </div>
-</div> 
+</div>
+<?php require_once '../includes/footer.php'; ?> 

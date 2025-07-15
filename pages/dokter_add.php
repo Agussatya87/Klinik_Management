@@ -2,6 +2,7 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/functions.php';
 
@@ -28,7 +29,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 }
+
+require_once __DIR__ . '/../includes/header.php';
 ?>
+
 <div class="container mt-4">
     <div class="row justify-content-center">
         <div class="col-md-8">
@@ -46,31 +50,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </ul>
                         </div>
                     <?php endif; ?>
-                    <form method="POST" action="">
-                        <div class="mb-3">
-                            <label class="form-label" for="nama">Nama *</label>
-                            <input type="text" class="form-control" id="nama" name="nama" required value="<?php echo isset($_POST['nama']) ? htmlspecialchars($_POST['nama']) : ''; ?>">
+
+                    <form method="POST" action="" class="needs-validation" novalidate>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label" for="nama">Nama Lengkap *</label>
+                                <input type="text" class="form-control" id="nama" name="nama" required value="<?php echo isset($_POST['nama']) ? htmlspecialchars($_POST['nama']) : ''; ?>">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="jenis_kelamin">Jenis Kelamin *</label>
+                                <select class="form-select" id="jenis_kelamin" name="jenis_kelamin" required>
+                                    <option value="">Pilih Jenis Kelamin</option>
+                                    <option value="L" <?php if (isset($_POST['jenis_kelamin']) && $_POST['jenis_kelamin'] == 'L') echo 'selected'; ?>>Laki-laki</option>
+                                    <option value="P" <?php if (isset($_POST['jenis_kelamin']) && $_POST['jenis_kelamin'] == 'P') echo 'selected'; ?>>Perempuan</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label" for="jenis_kelamin">Jenis Kelamin *</label>
-                            <select class="form-select" id="jenis_kelamin" name="jenis_kelamin" required>
-                                <option value="">Pilih Jenis Kelamin</option>
-                                <option value="L" <?php if(isset($_POST['jenis_kelamin']) && $_POST['jenis_kelamin']=='L') echo 'selected'; ?>>Laki-laki</option>
-                                <option value="P" <?php if(isset($_POST['jenis_kelamin']) && $_POST['jenis_kelamin']=='P') echo 'selected'; ?>>Perempuan</option>
-                            </select>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label" for="telpon">Nomor Telepon *</label>
+                                <input type="text" class="form-control" id="telpon" name="telpon" required value="<?php echo isset($_POST['telpon']) ? htmlspecialchars($_POST['telpon']) : ''; ?>">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="spesialisasi">Spesialisasi *</label>
+                                <input type="text" class="form-control" id="spesialisasi" name="spesialisasi" value="<?php echo isset($_POST['spesialisasi']) ? htmlspecialchars($_POST['spesialisasi']) : ''; ?>">
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label" for="telpon">Telepon *</label>
-                            <input type="text" class="form-control" id="telpon" name="telpon" required value="<?php echo isset($_POST['telpon']) ? htmlspecialchars($_POST['telpon']) : ''; ?>">
-                        </div>
+
                         <div class="mb-3">
                             <label class="form-label" for="alamat">Alamat</label>
-                            <textarea class="form-control" id="alamat" name="alamat"><?php echo isset($_POST['alamat']) ? htmlspecialchars($_POST['alamat']) : ''; ?></textarea>
+                            <textarea class="form-control" id="alamat" name="alamat" rows="2"><?php echo isset($_POST['alamat']) ? htmlspecialchars($_POST['alamat']) : ''; ?></textarea>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label" for="spesialisasi">Spesialisasi *</label>
-                            <input type="text" class="form-control" id="spesialisasi" name="spesialisasi" required value="<?php echo isset($_POST['spesialisasi']) ? htmlspecialchars($_POST['spesialisasi']) : ''; ?>">
-                        </div>
+
                         <div class="d-flex justify-content-between">
                             <a href="/Klinik_Management/index.php?page=dokter" class="btn btn-secondary">Kembali</a>
                             <button type="submit" class="btn btn-primary">Simpan</button>
@@ -80,4 +92,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
     </div>
-</div> 
+</div>
