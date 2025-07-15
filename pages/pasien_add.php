@@ -33,6 +33,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+// Get next auto-increment value for pasien
+$next_id = 1;
+$sql = "SHOW TABLE STATUS LIKE 'pasien'";
+$status = fetchOne($sql);
+if ($status && isset($status['Auto_increment'])) {
+    $next_id = (int)$status['Auto_increment'];
+}
+$display_id = 'PS' . str_pad($next_id, 3, '0', STR_PAD_LEFT);
+
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
@@ -54,6 +63,10 @@ require_once __DIR__ . '/../includes/header.php';
                         </div>
                     <?php endif; ?>
                     <form method="POST" action="">
+                        <div class="mb-3">
+                            <label class="form-label" for="display_id">ID Pasien</label>
+                            <input type="text" class="form-control" id="display_id" name="display_id" value="<?php echo $display_id; ?>" readonly>
+                        </div>
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label" for="nama">Nama Lengkap *</label>
@@ -113,3 +126,4 @@ require_once __DIR__ . '/../includes/header.php';
 </div>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
+<script src="/Klinik_Management/assets/js/script.js"></script>

@@ -1,4 +1,5 @@
 <?php
+$action = isset($_POST['action']) ? $_POST['action'] : (isset($_GET['action']) ? $_GET['action'] : 'list');
 $search = isset($_GET['search']) ? sanitizeInput($_GET['search']) : '';
 $page_num = isset($_GET['page_num']) ? (int)$_GET['page_num'] : 1;
 
@@ -82,6 +83,7 @@ $page_num = isset($_GET['page_num']) ? (int)$_GET['page_num'] : 1;
                     <table class="table table-hover">
                         <thead>
                             <tr>
+                                <th>ID Dokter</th>
                                 <th>Nama</th>
                                 <th>Jenis Kelamin</th>
                                 <th>Telepon</th>
@@ -93,6 +95,7 @@ $page_num = isset($_GET['page_num']) ? (int)$_GET['page_num'] : 1;
                         <tbody>
                             <?php foreach ($dokters as $d): ?>
                                 <tr>
+                                    <td><span class="badge bg-info text-dark"><?php echo 'DK' . str_pad($d['iddokter'], 3, '0', STR_PAD_LEFT); ?></span></td>
                                     <td><strong><?php echo $d['nama']; ?></strong></td>
                                     <td><?php echo $d['jenis_kelamin']; ?></td>
                                     <td><?php echo $d['telpon']; ?></td>

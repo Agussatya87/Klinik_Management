@@ -24,7 +24,7 @@ if ($action == 'list' || $action == 'edit') {
     $pagination = getPagination($total_records, $records_per_page, $page_num);
 
     // Get patients
-    $sql = "SELECT * FROM pasien {$where_clause} ORDER BY tgl_daftar DESC LIMIT {$pagination['offset']}, {$pagination['records_per_page']}";
+    $sql = "SELECT * FROM pasien {$where_clause} ORDER BY idpasien DESC LIMIT {$pagination['offset']}, {$pagination['records_per_page']}";
     $patients = fetchAll($sql, $params);
 }
 
@@ -36,6 +36,7 @@ if ($isAjax) {
         <table class="table table-hover" id="patientsTable">
             <thead>
                 <tr>
+                    <th>ID Pasien</th>
                     <th>Nama</th>
                     <th>Jenis Kelamin</th>
                     <th>Pekerjaan</th>
@@ -50,6 +51,7 @@ if ($isAjax) {
             <tbody>
                 <?php foreach ($patients as $p): ?>
                     <tr>
+                        <td><span class="badge bg-info text-dark"><?php echo 'PS' . str_pad($p['idpasien'], 3, '0', STR_PAD_LEFT); ?></span></td>
                         <td><strong><?php echo $p['nama']; ?></strong></td>
                         <td><?php echo $p['jenis_kelamin']; ?></td>
                         <td><?php echo $p['pekerjaan']; ?></td>
@@ -136,6 +138,7 @@ if ($isAjax) {
                     <table class="table table-hover" id="patientsTable">
                         <thead>
                             <tr>
+                                <th>ID Pasien</th>
                                 <th>Nama</th>
                                 <th>Jenis Kelamin</th>
                                 <th>Pekerjaan</th>
@@ -150,6 +153,7 @@ if ($isAjax) {
                         <tbody>
                             <?php foreach ($patients as $p): ?>
                                 <tr>
+                                    <td><span class="badge bg-info text-dark"><?php echo 'PS' . str_pad($p['idpasien'], 3, '0', STR_PAD_LEFT); ?></span></td>
                                     <td><strong><?php echo $p['nama']; ?></strong></td>
                                     <td><?php echo $p['jenis_kelamin']; ?></td>
                                     <td><?php echo $p['pekerjaan']; ?></td>

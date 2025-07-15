@@ -10,36 +10,65 @@
         $$('[data-bs-toggle="popover"]').forEach(el => new bootstrap.Popover(el));
     }
 
-    // ⏳ Loading on Submit
-    function setupSubmitLoading() {
-        $$('form button[type="submit"]').forEach(button => {
-            const form = button.closest('form');
-            button.addEventListener('click', () => {
-                if (form && form.checkValidity()) {
-                    button.disabled = true;
-                    button.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Menyimpan...';
-                }
-            });
-        });
-    }
+    // // ⏳ Loading on Submit
+    // function setupSubmitLoading() {
+    //     $$('form button[type="submit"]').forEach(button => {
+    //         const form = button.closest('form');
+    //         button.addEventListener('click', () => {
+    //             if (form && form.checkValidity()) {
+    //                 button.disabled = true;
+    //                 button.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Menyimpan...';
+    //             }
+    //         });
+    //     });
+    // }
 
-    // ⚠️ Form Validasi
-    function setupFormValidation() {
-        $$('.needs-validation').forEach(form => {
-            form.addEventListener('submit', e => {
-                if (!form.checkValidity()) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
-                form.classList.add('was-validated');
-            });
-        });
-    }
+    // // ⚠️ Form Validasi
+    // function setupFormValidation() {
+    //     $$('.needs-validation').forEach(form => {
+    //         form.addEventListener('submit', e => {
+    //             console.log('Form valid?', form.checkValidity());
 
-    // 🗑️ Auto Dismiss Alert
-    function autoDismissAlerts(timeout = 5000) {
+    //             if (!form.checkValidity()) {
+    //                 e.preventDefault();
+    //                 e.stopPropagation();
+    //                 console.log('Form submit dicegah karena invalid!');
+
+    //                 const elements = Array.from(form.elements);
+    //                 const invalidFields = elements.filter(el => !el.checkValidity());
+
+    //                 if (invalidFields.length > 0) {
+    //                     // Fokus ke field invalid pertama
+    //                     invalidFields[0].focus();
+
+    //                     // Log error tiap field
+    //                     invalidFields.forEach(el => {
+    //                         const label = form.querySelector(`label[for="${el.id}"]`);
+    //                         const labelText = label ? label.innerText : el.name || el.id || 'unknown';
+    //                         console.warn(`⚠️ Field "${labelText}" invalid: ${el.validationMessage}`);
+    //                     });
+    //                 }
+    //             }
+
+    //             form.classList.add('was-validated');
+    //         });
+    //     });
+    // }
+
+    // 🗑️ Auto Dismiss Alert (3 detik)
+    function autoDismissAlerts(timeout = 3000) {
+        const alerts = $$('.alert-dismissible');
+        if (alerts.length === 0) return;
+
         setTimeout(() => {
-            $$('.alert').forEach(a => new bootstrap.Alert(a).close());
+            alerts.forEach(alert => {
+                try {
+                    const bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+                    bsAlert.close();
+                } catch (err) {
+                    console.warn('❌ Gagal dismiss alert:', err);
+                }
+            });
         }, timeout);
     }
 
@@ -58,34 +87,6 @@
                     hour: '2-digit', minute: '2-digit'
                 });
             }
-        });
-    }
-
-    // 💾 Auto Save Form ke LocalStorage
-    function autoSaveForms() {
-        $$('form').forEach(form => {
-            const formId = form.id || `form_${Math.random().toString(36).slice(2, 9)}`;
-            form.id = formId;
-
-            const saved = localStorage.getItem('form_' + formId);
-            if (saved) {
-                Object.entries(JSON.parse(saved)).forEach(([k, v]) => {
-                    const f = form.elements.namedItem(k);
-                    if (f && !f.value) f.value = v;
-                });
-            }
-
-            form.addEventListener('input', () => {
-                const data = {};
-                Array.from(form.elements).forEach(e => {
-                    if (e.name) data[e.name] = e.value;
-                });
-                localStorage.setItem('form_' + formId, JSON.stringify(data));
-            });
-
-            form.addEventListener('submit', () => {
-                localStorage.removeItem('form_' + formId);
-            });
         });
     }
 
@@ -121,27 +122,6 @@
         if (idInput) idInput.value = id;
 
         new bootstrap.Modal(modal).show();
-    };
-
-    // 📤 Export Table ke CSV
-    window.exportToCSV = function (tableId, filename) {
-        const table = document.getElementById(tableId);
-        if (!table) return;
-
-        const rows = Array.from(table.querySelectorAll('tr'));
-        const csv = rows.map(row =>
-            Array.from(row.querySelectorAll('td, th')).map(cell => {
-                let text = cell.textContent.trim();
-                if (text.includes(',')) text = `"${text.replace(/"/g, '""')}"`;
-                return text;
-            }).join(',')
-        ).join('\n');
-
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `${filename}.csv`;
-        link.click();
     };
 
     // ⌨️ Keyboard Shortcuts
@@ -181,11 +161,10 @@
     // 🚀 Inisialisasi Utama
     function init() {
         initBootstrapUI();
-        setupFormValidation();
-        setupSubmitLoading();
-        autoDismissAlerts();
+        // setupFormValidation();
+        // setupSubmitLoading();
+        autoDismissAlerts(); // Flash alert auto close after 3s
         defaultDateTime();
-        autoSaveForms();
         enableRowHighlight();
         setupSearchSubmit();
         setupKeyboardShortcuts();

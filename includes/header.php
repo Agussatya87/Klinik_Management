@@ -10,11 +10,11 @@
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <!-- Custom CSS -->
-    <link href="assets/css/style.css" rel="stylesheet">
+    <link href="/Klinik_Management/assets/css/style.css" rel="stylesheet">
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-3">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-3 sticky-top">
         <div class="container-fluid">
             <a class="navbar-brand d-flex align-items-center gap-2" href="/Klinik_Management/index.php">
                 <img src="/Klinik_Management/assets/logo.jpg" alt="Logo" width="48" height="48" class="me-2" style="object-fit:contain;">

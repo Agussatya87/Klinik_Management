@@ -30,6 +30,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+// Get next doctor ID for display
+$nextId = fetchOne("SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'db_klinik_management' AND TABLE_NAME = 'dokter'");
+$nextIdFormatted = 'DK' . str_pad($nextId['AUTO_INCREMENT'], 3, '0', STR_PAD_LEFT);
+
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
@@ -50,8 +54,11 @@ require_once __DIR__ . '/../includes/header.php';
                             </ul>
                         </div>
                     <?php endif; ?>
-
-                    <form method="POST" action="" class="needs-validation" novalidate>
+                    <form method="POST" action="" nonvalidate>
+                        <div class="mb-3">
+                            <label class="form-label" for="iddokter">ID Dokter</label>
+                            <input type="text" class="form-control" id="iddokter" name="iddokter" value="<?php echo $nextIdFormatted; ?>" readonly>
+                        </div>
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label" for="nama">Nama Lengkap *</label>

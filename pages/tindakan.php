@@ -66,6 +66,7 @@ $tindakans = fetchAll($sql, $params);
                 <table class="table table-hover">
                     <thead>
                         <tr>
+                            <th>ID Tindakan</th>
                             <th>Pasien</th>
                             <th>Kriteria</th>
                             <th>Tindakan</th>
@@ -78,11 +79,12 @@ $tindakans = fetchAll($sql, $params);
                     <tbody>
                         <?php if (empty($tindakans)): ?>
                             <tr>
-                                <td colspan="7" class="text-center text-muted">Tidak ada data tindakan.</td>
+                                <td colspan="8" class="text-center text-muted">Tidak ada data tindakan.</td>
                             </tr>
                         <?php else: ?>
                             <?php foreach ($tindakans as $t): ?>
                                 <tr>
+                                    <td><span class="badge bg-info text-dark"><?php echo 'TM' . str_pad($t['idtindakan'], 3, '0', STR_PAD_LEFT); ?></span></td>
                                     <td><?= htmlspecialchars($t['nama_pasien']) ?></td>
                                     <td><?= htmlspecialchars($t['kriteria']) ?></td>
                                     <td><?= htmlspecialchars($t['tindakan']) ?></td>

@@ -78,11 +78,6 @@ if ($action == 'list') {
                                 </button>
                             </div>
                         </div>
-                        <div class="col-md-4 text-end">
-                            <a href="index.php?page=ruang" class="btn btn-outline-secondary">
-                                <i class="bi bi-arrow-clockwise"></i> Reset
-                            </a>
-                        </div>
                     </div>
                 </form>
             </div>
@@ -106,6 +101,7 @@ if ($action == 'list') {
                         <table class="table table-hover">
                             <thead>
                                 <tr>
+                                    <th>ID Ruang</th>
                                     <th>Nama Ruang</th>
                                     <th>Status</th>
                                     <th>Aksi</th>
@@ -114,6 +110,7 @@ if ($action == 'list') {
                             <tbody>
                                 <?php foreach ($rooms as $r): ?>
                                     <tr>
+                                        <td><span class="badge bg-info text-dark"><?php echo 'RG' . str_pad($r['idruang'], 3, '0', STR_PAD_LEFT); ?></span></td>
                                         <td><strong><?php echo $r['nama_ruang']; ?></strong></td>
                                         <td>
                                             <?php if ($r['status'] == 'Kosong'): ?>

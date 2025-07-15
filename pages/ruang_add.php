@@ -25,6 +25,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 }
+// Get next room ID for display
+$nextId = fetchOne("SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'db_klinik_management' AND TABLE_NAME = 'ruang'");
+$nextIdFormatted = 'RG' . str_pad($nextId['AUTO_INCREMENT'], 3, '0', STR_PAD_LEFT);
 require_once __DIR__ . '/../includes/header.php';
 ?>
 <div class="container mt-4">
@@ -45,6 +48,10 @@ require_once __DIR__ . '/../includes/header.php';
                         </div>
                     <?php endif; ?>
                     <form method="POST" action="">
+                        <div class="mb-3">
+                            <label class="form-label" for="idruang">ID Ruang</label>
+                            <input type="text" class="form-control" id="idruang" name="idruang" value="<?php echo $nextIdFormatted; ?>" readonly>
+                        </div>
                         <div class="mb-3">
                             <label class="form-label" for="nama_ruang">Nama Ruang *</label>
                             <input type="text" class="form-control" id="nama_ruang" name="nama_ruang" required value="<?php echo isset($_POST['nama_ruang']) ? htmlspecialchars($_POST['nama_ruang']) : ''; ?>">

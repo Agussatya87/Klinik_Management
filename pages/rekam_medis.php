@@ -145,7 +145,7 @@ $tindakans = fetchAll("SELECT idtindakan, tindakan FROM tindakan ORDER BY tindak
                             <?php else: ?>
                                 <?php foreach ($medical_records as $rm): ?>
                                     <tr>
-                                        <td><?php echo $rm['idrm']; ?></td>
+                                        <td><span class="badge bg-info text-dark"><?php echo 'RM' . str_pad($rm['idrm'], 3, '0', STR_PAD_LEFT); ?></span></td>
                                         <td><?php echo $rm['nama_pasien']; ?></td>
                                         <td><?php echo $rm['nama_dokter']; ?></td>
                                         <td><?php echo $rm['nama_ruang']; ?></td>

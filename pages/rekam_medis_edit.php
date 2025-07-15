@@ -25,7 +25,8 @@ if (!$rekam_medis) {
 }
 
 $patients = fetchAll("SELECT idpasien, nama FROM pasien ORDER BY nama");
-$rooms = getAllRooms(); // Get all rooms with status
+// Fetch all rooms with status 'Kosong' or the currently assigned room
+$rooms = fetchAll("SELECT idruang, nama_ruang, status FROM ruang WHERE status = 'Kosong' OR idruang = ? ORDER BY nama_ruang", [$rekam_medis['idruang']]);
 $tindakans = fetchAll("SELECT idtindakan, tindakan FROM tindakan ORDER BY tindakan");
 $doctors = fetchAll("SELECT iddokter, nama FROM dokter ORDER BY nama");
 $errors = [];
