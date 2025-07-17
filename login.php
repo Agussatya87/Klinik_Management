@@ -49,9 +49,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <div class="card shadow">
                     <div class="card-body p-5">
                         <div class="text-center mb-4">
-                            <i class="bi bi-heart-pulse text-primary" style="font-size: 3rem;"></i>
+                            <img src="assets/logo.jpg" alt="Klinik Logo" style="width: 80px; height: 80px; object-fit: cover; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
                             <h2 class="mt-3">Klinik Management</h2>
-                            <p class="text-muted">Please sign in to continue</p>
+                            <p class="text-muted">Please login to continue</p>
                         </div>
                         
                         <?php if ($error): ?>
@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             </div>
                             
                             <button type="submit" class="btn btn-primary w-100">
-                                <i class="bi bi-box-arrow-in-right"></i> Sign In
+                                <i class="bi bi-box-arrow-in-right"></i> login
                             </button>
                         </form>
                     </div>

@@ -1,0 +1,20 @@
+# Set the default index file
+DirectoryIndex index.php
+
+# Prevent direct access to config and database folders
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+# Block access to config and database folders
+RewriteRule ^config/ - [F,L]
+RewriteRule ^database/ - [F,L]
+
+# Block direct access to PHP files in includes
+RewriteRule ^includes/.*\.php$ - [F,L]
+</IfModule>
+
+# Deny access to .htaccess itself
+<Files .htaccess>
+    Order allow,deny
+    Deny from all
+</Files> 

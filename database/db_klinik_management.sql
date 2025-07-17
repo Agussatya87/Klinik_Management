@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 12, 2025 at 10:44 AM
+-- Generation Time: Jul 16, 2025 at 06:57 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -41,8 +41,7 @@ CREATE TABLE `dokter` (
 --
 
 INSERT INTO `dokter` (`iddokter`, `nama`, `jenis_kelamin`, `telpon`, `alamat`, `spesialisasi`) VALUES
-(1, 'Toni', 'L', '081762538264', 'Jl. Mekar No. 9', 'Dokter Umum'),
-(2, 'sadasda', 'L', '131411', 'adadad', 'adada');
+(1, 'Satya', 'L', '081917827383', 'Jl. Suli No. 69', 'Penyakit Dalam');
 
 -- --------------------------------------------------------
 
@@ -67,11 +66,8 @@ CREATE TABLE `pasien` (
 --
 
 INSERT INTO `pasien` (`idpasien`, `nama`, `jenis_kelamin`, `pekerjaan`, `tmp_lahir`, `tgl_lahir`, `telpon`, `alamat`, `tgl_daftar`) VALUES
-(1, 'Tono', 'L', 'Chef', 'Singapore', '2000-01-18', '081131313131', 'Jl. Merdeka no 13', '2025-07-06'),
-(18, 'Fanny', 'P', 'Web Developer', 'Bali', '2002-06-20', '0817625382639', 'Jl. Mawar No. 2', '2025-07-11'),
-(22, 'Dede', 'L', 'Data Scientist', 'Mataram', '2002-01-05', '081625372638', 'Jl. Belimbing No. 1', '2025-07-11'),
-(24, 'Pores', 'P', 'Perawat', 'Sumatra Utara', '2010-06-24', '081525232523', 'Jl. Mekar Sari No. 78', '2025-07-12'),
-(25, 'Jarwo', 'L', 'Anggota Ormas', 'Jawa', '1980-09-23', '085917236471', 'Jl. Melayu No. 99', '2025-07-12');
+(1, 'Fanny', 'P', 'Web Developer', 'Sumatra Utara', '2002-06-30', '081736573263', 'Jl. Nangka No. 69', '2025-07-16'),
+(2, 'Tono', 'L', 'Karyawan Swasta', 'Jawa', '1994-08-25', '085917364735', 'Jl. Mawar No. 7', '2025-07-16');
 
 -- --------------------------------------------------------
 
@@ -87,6 +83,13 @@ CREATE TABLE `rekam_medis` (
   `diagnosis` text DEFAULT NULL,
   `idtindakan` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `rekam_medis`
+--
+
+INSERT INTO `rekam_medis` (`idrm`, `idpasien`, `iddokter`, `idruang`, `diagnosis`, `idtindakan`) VALUES
+(2, 1, 1, 1, 'Sakit', 1);
 
 -- --------------------------------------------------------
 
@@ -105,9 +108,8 @@ CREATE TABLE `ruang` (
 --
 
 INSERT INTO `ruang` (`idruang`, `nama_ruang`, `status`) VALUES
-(3, 'Ekonomi', 'Kosong'),
-(4, 'Bussines', 'Kosong'),
-(5, 'Ekonomi Plus', 'Kosong');
+(1, 'VVIP', 'Terisi'),
+(2, 'Ekonomi', 'Kosong');
 
 -- --------------------------------------------------------
 
@@ -130,10 +132,8 @@ CREATE TABLE `tindakan` (
 --
 
 INSERT INTO `tindakan` (`idtindakan`, `idpasien`, `kriteria`, `tindakan`, `iddokter`, `fasilitas`, `keputusan_keluarga`) VALUES
-(1, 22, 'ad', 'sada', 1, 'ICU', 'sadasd'),
-(2, 18, 'sadda', 'adad', 1, 'Laboratory', 'adada'),
-(3, 1, 'sasa', 'dfdfd', 1, 'ICU', 'setuju'),
-(4, 24, 'Sakit Hati', 'Tidur', 1, 'Pharmacy', 'Setuju');
+(1, 1, 'Auto Imun', 'Operasi', 1, 'ICU', 'Setuju'),
+(2, 2, 'Diare', 'Berak', 1, 'Operating Room', 'Setuju');
 
 -- --------------------------------------------------------
 
@@ -208,31 +208,31 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `dokter`
 --
 ALTER TABLE `dokter`
-  MODIFY `iddokter` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `iddokter` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `pasien`
 --
 ALTER TABLE `pasien`
-  MODIFY `idpasien` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `idpasien` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `rekam_medis`
 --
 ALTER TABLE `rekam_medis`
-  MODIFY `idrm` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `idrm` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `ruang`
 --
 ALTER TABLE `ruang`
-  MODIFY `idruang` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `idruang` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `tindakan`
 --
 ALTER TABLE `tindakan`
-  MODIFY `idtindakan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `idtindakan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `users`
